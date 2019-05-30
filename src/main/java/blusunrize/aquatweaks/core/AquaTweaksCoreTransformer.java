@@ -3,6 +3,7 @@ package blusunrize.aquatweaks.core;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.world.ChunkCache;
@@ -60,18 +61,25 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 		}
 
 		@Override
-		public void visitInsn(int opcode)
-		{
-			if(opcode==Opcodes.RETURN)
+		public void visitMethodInsn(int opcode, String owner, String name, String desc) {
+
+			if(owner.equals("net/minecraft/client/renderer/Tessellator") && name.equals("setTranslation") && desc.equals("(DDD)V"))
 			{
 				mv.visitVarInsn(Opcodes.ALOAD, 0);
-				mv.visitVarInsn(Opcodes.ILOAD, 1);
+				mv.visitVarInsn(Opcodes.ALOAD, 10);
+				mv.visitVarInsn(Opcodes.ILOAD, 11);
+				mv.visitVarInsn(Opcodes.ALOAD, 0);
+				mv.visitFieldInsn(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", "posX", "I");
+				mv.visitVarInsn(Opcodes.ALOAD, 0);
+				mv.visitFieldInsn(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", "posY", "I");
+				mv.visitVarInsn(Opcodes.ALOAD, 0);
+				mv.visitFieldInsn(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", "posZ", "I");
 				mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 						"blusunrize/aquatweaks/core/AquaTweaksCoreTransformer",
 						"fireMidRenderEvent",
-							"(Lnet/minecraft/client/renderer/WorldRenderer;I)V");
+						"(Lnet/minecraft/client/renderer/WorldRenderer;Lnet/minecraft/client/renderer/RenderBlocks;IIII)V");
 			}
-			super.visitInsn(opcode);
+			super.visitMethodInsn(opcode, owner, name, desc);
 		}
 	}
 
@@ -85,10 +93,10 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 		@Override
 		public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 		{
-			final String methodToPatch = "preRenderBlocks";
-			final String methodToPatch_srg = "func_147890_b";
-			final String methodToPatch_obf = "b";
-			final String qdesc = "(I)V";
+			final String methodToPatch = "updateRenderer";
+			final String methodToPatch_srg = "func_78907_a";
+			final String methodToPatch_obf = "a";
+			final String qdesc = "()V";
 			if((name.equals(methodToPatch)||name.equals(methodToPatch_srg)||name.equals(methodToPatch_obf))
 					&&(desc.equals(qdesc)))
 			{
@@ -99,9 +107,9 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 			return super.visitMethod(access, name, desc, signature, exceptions);
 		}
 	}
-	public static void fireMidRenderEvent(WorldRenderer wr, int pass)
+	public static void fireMidRenderEvent(WorldRenderer wr, RenderBlocks rb, int pass, int posX, int posY, int posZ)
 	{
-		RenderBlocks rb = ObfuscationReflectionHelper.getPrivateValue(ForgeHooksClient.class,null, "worldRendererRB");
+		Tessellator.instance.setTranslation((double)(-posX), (double)(-posY), (double)(-posZ));
 		if(rb!=null && rb.blockAccess instanceof ChunkCache)
 			MinecraftForge.EVENT_BUS.post(new RenderWorldEventMid(wr, (ChunkCache)rb.blockAccess, rb, pass));
 	}
@@ -154,6 +162,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 			return super.visitMethod(access, name, desc, signature, exceptions);
 		}
 	}
+
 	public static boolean liquid_shouldSideBeRendered(Block block, IBlockAccess world, int x, int y, int z, int side)
 	{
 		if(side>=0 && side<6)
