@@ -51,6 +51,23 @@ public class AquaTweaks
 	public void init(FMLInitializationEvent event)
 	{
 		proxy.registerHandlers();
+	}
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event)
+	{
+		ImmutableList<FMLInterModComms.IMCMessage> messages = FMLInterModComms.fetchRuntimeMessages(this);
+		for(FMLInterModComms.IMCMessage message : messages)
+			if(message.key.equals("registerAquaConnectable"))
+			{
+				NBTTagCompound tag = message.getNBTValue();
+				if(tag!=null && tag.hasKey("modid") && tag.hasKey("block"))
+				{
+					Block b = GameRegistry.findBlock(tag.getString("modid"), tag.getString("block"));
+					int meta = !tag.hasKey("meta")?OreDictionary.WILDCARD_VALUE: tag.getInteger("meta");
+					FluidUtils.addBlockToValidConnectables(b, meta);
+				}
+			}
+
 		FluidUtils.addDefaultConnectables();
 		for(String s : manualTweaks)
 		{
@@ -73,21 +90,5 @@ public class AquaTweaks
 			else
 				ATLog.info("Failed to register '"+s+"'; not a valid block identifier.");
 		}
-	}
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{
-		ImmutableList<FMLInterModComms.IMCMessage> messages = FMLInterModComms.fetchRuntimeMessages(this);
-		for(FMLInterModComms.IMCMessage message : messages)
-			if(message.key.equals("registerAquaConnectable"))
-			{
-				NBTTagCompound tag = message.getNBTValue();
-				if(tag!=null && tag.hasKey("modid") && tag.hasKey("block"))
-				{
-					Block b = GameRegistry.findBlock(tag.getString("modid"), tag.getString("block"));
-					int meta = !tag.hasKey("meta")?OreDictionary.WILDCARD_VALUE: tag.getInteger("meta");
-					FluidUtils.addBlockToValidConnectables(b, meta);
-				}
-			}
 	}
 }
