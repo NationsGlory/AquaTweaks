@@ -1,11 +1,10 @@
 package blusunrize.aquatweaks;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
 
 public class ATLog
 {
-	public static final Logger logger = LogManager.getLogger("AquaTweaks");
+	public static final Logger logger = Logger.getLogger("AquaTweaks");
 
 	public static void info(String s)
 	{

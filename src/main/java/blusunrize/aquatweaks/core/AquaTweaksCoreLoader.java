@@ -4,7 +4,7 @@ import java.util.Map;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
-@IFMLLoadingPlugin.MCVersion("1.7.10")
+@IFMLLoadingPlugin.MCVersion("1.6.4")
 @IFMLLoadingPlugin.Name(AquaTweaksCoreLoader.NAME)
 public class AquaTweaksCoreLoader implements IFMLLoadingPlugin
 {
@@ -27,10 +27,5 @@ public class AquaTweaksCoreLoader implements IFMLLoadingPlugin
 	@Override
 	public void injectData(Map<String, Object> data)
 	{
-	}
-	@Override
-	public String getAccessTransformerClass()
-	{
-		return null;
 	}
 }

@@ -1,21 +1,21 @@
 package blusunrize.aquatweaks;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import blusunrize.aquatweaks.api.IAquaConnectable;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockFluid;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.Icon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
-import blusunrize.aquatweaks.api.IAquaConnectable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FluidUtils
 {
@@ -27,37 +27,37 @@ public class FluidUtils
 	}
 	public static void addDefaultConnectables()
 	{
-		addBlockToValidConnectables(Blocks.ladder,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.iron_bars,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.skull,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.ladder,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.fenceIron,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.skull,OreDictionary.WILDCARD_VALUE);
 		//Buttons and levers get washed away, but at least it looks good
-		addBlockToValidConnectables(Blocks.stone_button,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.wooden_button,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.lever,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.hopper,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.stone_pressure_plate,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.wooden_pressure_plate,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.light_weighted_pressure_plate,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.heavy_weighted_pressure_plate,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.anvil,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.fence,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.fence_gate,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.nether_brick_fence,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.wall_sign,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.standing_sign,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.stoneButton,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.stoneButton,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.lever,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.hopperBlock,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.pressurePlateStone,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.pressurePlatePlanks,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.pressurePlateIron,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.pressurePlateGold,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.anvil,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.fence,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.fenceGate,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.netherFence,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.signWall,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.signPost,OreDictionary.WILDCARD_VALUE);
 
 		//These would usually get flushed away, but Vazkii's Waterproof fixes that
-		addBlockToValidConnectables(Blocks.redstone_wire,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.redstone_torch,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.unlit_redstone_torch,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.unpowered_repeater,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.powered_repeater,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.unpowered_comparator,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.powered_comparator,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.rail,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.golden_rail,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.detector_rail,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Blocks.activator_rail,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.redstoneWire,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.torchRedstoneActive,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.torchRedstoneIdle,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.redstoneRepeaterIdle,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.redstoneRepeaterActive,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.redstoneComparatorIdle,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.redstoneComparatorActive,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.rail,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.railPowered,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.railDetector,OreDictionary.WILDCARD_VALUE);
+		addBlockToValidConnectables(Block.railActivator,OreDictionary.WILDCARD_VALUE);
 	}
 
 	public static Vec3 getFlowVector(IBlockAccess world, int x, int y, int z, Material mat)
@@ -84,7 +84,7 @@ public class FluidUtils
 
 			if(delay2 < 0)
 			{
-				if(!world.getBlock(xx, y, zz).getMaterial().blocksMovement())
+				if(!world.getBlockMaterial(xx, y, zz).blocksMovement())
 				{
 					delay2 = getEffectiveFlowDelay(world, xx, y - 1, zz, mat);
 					if(delay2 >= 0)
@@ -110,7 +110,7 @@ public class FluidUtils
 
 	public static int getEffectiveFlowDelay(IBlockAccess world, int x, int y, int z, Material mat)
 	{
-		if(world.getBlock(x, y, z).getMaterial()!=mat)
+		if(world.getBlockMaterial(x, y, z)!=mat)
 			return -1;
 		else
 		{
@@ -137,21 +137,21 @@ public class FluidUtils
 			int j1 = x - (i1 & 1);
 			int k1 = z - (i1 >> 1 & 1);
 
-			if (world.getBlock(j1, y + 1, k1).getMaterial()==mat)
+			if (world.getBlockMaterial(j1, y + 1, k1)==mat)
 				return 1F;
 			if(canConnectAquaConnectable(world, j1,y+1,k1, 0) && (getFluidHeight(world,j1,y+1,k1,mat)>0||getFluidHeight(world,j1+1,y+1,k1,mat)>0||getFluidHeight(world,j1+1,y+1,k1+1,mat)>0||getFluidHeight(world,j1,y+1,k1+1,mat)>0))
 				return 1f;
 
-			Material material1 = world.getBlock(j1, y, k1).getMaterial();
+			Material material1 = world.getBlockMaterial(j1, y, k1);
 			if(material1==mat)
 			{
 				int l1 = world.getBlockMetadata(j1, y, k1);
 				if (l1 >= 8 || l1 == 0)
 				{
-					f += BlockLiquid.getLiquidHeightPercent(l1) * 10f;
+					f += BlockFluid.getFluidHeightPercent(l1) * 10f;
 					l += 10;
 				}
-				f += BlockLiquid.getLiquidHeightPercent(l1);
+				f += BlockFluid.getFluidHeightPercent(l1);
 				++l;
 			}
 			else if (!material1.isSolid())
@@ -165,22 +165,22 @@ public class FluidUtils
 
 	public static void tessellateFluidBlock(IBlockAccess world, int x, int y, int z, RenderBlocks renderer, Tessellator tes)
 	{
-		Block block = world.getBlock(x, y, z);
+		Block block = Block.blocksList[world.getBlockId(x, y, z)];
 
 		Material material = null;
 		Block fluidBlock = null;
 		for(int yy : new int[]{0,1})
 			for(int xx : new int[]{-1,0,1})
 				for(int zz : new int[]{-1,0,1})
-					if(world.getBlock(x+xx,y+yy,z+zz).getMaterial()==Material.water)
+					if(world.getBlockMaterial(x+xx,y+yy,z+zz)==Material.water)
 					{
 						material = Material.water;
-						fluidBlock = world.getBlock(x+xx,y+yy,z+zz);
+						fluidBlock = Block.blocksList[world.getBlockId(x+xx,y+yy,z+zz)];
 					}
-					else if(material==null && world.getBlock(x+xx,y+yy,z+zz).getMaterial()==Material.lava)
+					else if(material==null && world.getBlockMaterial(x+xx,y+yy,z+zz)==Material.lava)
 					{
 						material = Material.lava;
-						fluidBlock = world.getBlock(x+xx,y+yy,z+zz);
+						fluidBlock = Block.blocksList[world.getBlockId(x+xx,y+yy,z+zz)];
 					}
 		if(material==null||fluidBlock==null)
 			return;
@@ -226,7 +226,7 @@ public class FluidUtils
 		double depth01=0;
 		double depth11=0;
 		double depth10=0;
-		if(world.getBlock(x,y-1,z).getMaterial()==material)
+		if(world.getBlockMaterial(x,y-1,z)==material)
 		{
 			depth00 = getFluidHeight(world, x+0, y-1, z+0, material);
 			depth01 = getFluidHeight(world, x+0, y-1, z+1, material);
@@ -250,16 +250,16 @@ public class FluidUtils
 		depth11 += d6;
 		depth10 += d6;
 
-		int colour00 = world.getBlock(x,y,z).getMaterial()==material?world.getBlock(x,y,z).colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
-		int colour01 = world.getBlock(x,y,z+1).getMaterial()==material?world.getBlock(x,y,z+1).colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
-		int colour11 = world.getBlock(x+1,y,z+1).getMaterial()==material?world.getBlock(x+1,y,z+1).colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
-		int colour10 = world.getBlock(x+1,y,z).getMaterial()==material?world.getBlock(x+1,y,z).colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
+		int colour00 = world.getBlockMaterial(x,y,z)==material?Block.blocksList[world.getBlockId(x,y,z)].colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
+		int colour01 = world.getBlockMaterial(x,y,z+1)==material?Block.blocksList[world.getBlockId(x,y,z+1)].colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
+		int colour11 = world.getBlockMaterial(x+1,y,z+1)==material?Block.blocksList[world.getBlockId(x+1,y,z+1)].colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
+		int colour10 = world.getBlockMaterial(x+1,y,z)==material?Block.blocksList[world.getBlockId(x+1,y,z)].colorMultiplier(renderer.blockAccess,x+1,y,z): 0xffffff;
 		float[] col00={(colour00>>16&255)/255f, (colour00>>8&255)/255f, (colour00&255)/255f};
 		float[] col01={(colour01>>16&255)/255f, (colour01>>8&255)/255f, (colour01&255)/255f};
 		float[] col11={(colour11>>16&255)/255f, (colour11>>8&255)/255f, (colour11&255)/255f};
 		float[] col10={(colour10>>16&255)/255f, (colour10>>8&255)/255f, (colour10&255)/255f};
 
-		IIcon iicon = renderer.getBlockIconFromSideAndMetadata(fluidBlock, 1, i1);
+		Icon iicon = renderer.getBlockIconFromSideAndMetadata(fluidBlock, 1, i1);
 
 		float f7 = (float)getFlowDirection(renderer.blockAccess, x, y, z, material);
 		if (f7 > -999.0F)
@@ -398,18 +398,25 @@ public class FluidUtils
 
 	public static boolean canFluidConnectToBlock(IBlockAccess world, int x, int y, int z, int side, Material material)
 	{
-		return world.getBlock(x,y,z).getMaterial()==material || (side!=1&& (world.getBlock(x,y,z).isOpaqueCube() || (AquaTweaks.tweakGlass&&world.getBlock(x,y,z).getMaterial()==Material.glass))) || (canConnectAquaConnectable(world, x,y,z, side)&&isBlockSubmerged(world,x,y,z,material, true)&&getFakeFillMaterial(world,x,y,z)==material);
+		return world.getBlockMaterial(x,y,z)==material || (side!=1&& (blockIsOpaque(world, x,y,z) || (AquaTweaks.tweakGlass&&world.getBlockMaterial(x,y,z)==Material.glass))) || (canConnectAquaConnectable(world, x,y,z, side)&&isBlockubmerged(world,x,y,z,material, true)&&getFakeFillMaterial(world,x,y,z)==material);
 	}
 	public static boolean canFakeFluidConnectToBlock(IBlockAccess world, int x, int y, int z, int side, Material material)
 	{
-		return world.getBlock(x,y,z).getMaterial()==material || (side!=1&& (world.getBlock(x,y,z).isOpaqueCube() || (AquaTweaks.tweakGlass&&world.getBlock(x,y,z).getMaterial()==Material.glass))) || (canConnectAquaConnectable(world, x,y,z, side)&&isBlockSubmerged(world,x,y,z,material, true)&&getFakeFillMaterial(world,x,y,z)==material);
+		return world.getBlockMaterial(x,y,z)==material || (side!=1&& (blockIsOpaque(world, x,y,z)  || (AquaTweaks.tweakGlass&&world.getBlockMaterial(x,y,z)==Material.glass))) || (canConnectAquaConnectable(world, x,y,z, side)&&isBlockubmerged(world,x,y,z,material, true)&&getFakeFillMaterial(world,x,y,z)==material);
+	}
+
+	public static boolean blockIsOpaque(IBlockAccess world, int x, int y, int z)
+	{
+		int id = world.getBlockId(x, y, z);
+		return id != 0 && Block.blocksList[id].isOpaqueCube();
 	}
 
 	public static boolean canConnectAquaConnectable(IBlockAccess world, int x, int y, int z, int side)
 	{
-		Block b = world.getBlock(x, y, z);
-		if(b!=Blocks.air)
+		int id = world.getBlockId(x,y,z);
+		if(id!=0)
 		{
+			Block b = Block.blocksList[id];
 			if(b instanceof IAquaConnectable && ((IAquaConnectable)b).canConnectTo(world,x,y,z,side))
 				return true;
 			for(Map.Entry<Block, Integer> e:  validConnectables.entrySet())
@@ -421,9 +428,10 @@ public class FluidUtils
 
 	public static boolean shouldRenderAquaConnectable(IBlockAccess world, int x, int y, int z)
 	{
-		Block b = world.getBlock(x, y, z);
-		if(b!=Blocks.air)
+		int id = world.getBlockId(x,y,z);
+		if(id!=0)
 		{
+			Block b = Block.blocksList[id];
 			if(b instanceof IAquaConnectable && ((IAquaConnectable)b).shouldRenderFluid(world,x,y,z))
 				return true;
 			for(Map.Entry<Block, Integer> e:  validConnectables.entrySet())
@@ -433,12 +441,12 @@ public class FluidUtils
 		return false;
 	}
 
-	public static boolean isBlockSubmerged(IBlockAccess world, int x, int y, int z, Material material, boolean fakeFluid)
+	public static boolean isBlockubmerged(IBlockAccess world, int x, int y, int z, Material material, boolean fakeFluid)
 	{
 		for(int f=2; f<6; ++f)
 		{
 			ForgeDirection fd = ForgeDirection.getOrientation(f);
-			if(world.getBlock(x+fd.offsetX, y+fd.offsetY, z+fd.offsetZ) instanceof BlockLiquid && getEffectiveFlowDelay(world, x+fd.offsetX, y+fd.offsetY, z+fd.offsetZ, material)<8)
+			if(Block.blocksList[world.getBlockId(x+fd.offsetX, y+fd.offsetY, z+fd.offsetZ)] instanceof BlockFluid && getEffectiveFlowDelay(world, x+fd.offsetX, y+fd.offsetY, z+fd.offsetZ, material)<8)
 				return true;
 			if(fakeFluid && canConnectAquaConnectable(world, x+fd.offsetX, y+fd.offsetY, z+fd.offsetZ, ForgeDirection.OPPOSITES[f])
 					)
@@ -454,72 +462,72 @@ public class FluidUtils
 		for(int yy : new int[]{0,1})
 			for(int xx : new int[]{-1,0,1})
 				for(int zz : new int[]{-1,0,1})
-					if(world.getBlock(x+xx,y+yy,z+zz).getMaterial()==Material.water)
+					if(world.getBlockMaterial(x+xx,y+yy,z+zz)==Material.water)
 						material = Material.water;
-					else if(material==null && world.getBlock(x+xx,y+yy,z+zz).getMaterial()==Material.lava)
+					else if(material==null && world.getBlockMaterial(x+xx,y+yy,z+zz)==Material.lava)
 						material = Material.lava;
 		return material;
 	}
 
-	public static void renderTowardsGlass(IBlockAccess world, int x, int y, int z, RenderBlocks renderBlocks)
+	public static void renderTowardsGlass(IBlockAccess world, int x, int y, int z, RenderBlocks renderBlock)
 	{
-		boolean ao = renderBlocks.enableAO;
-		renderBlocks.enableAO = false;
-		renderBlocks.setRenderBounds(0,0,0,1,1,1);
+		boolean ao = renderBlock.enableAO;
+		renderBlock.enableAO = false;
+		renderBlock.setRenderBounds(0,0,0,1,1,1);
 
-		IIcon icon = null;
+		Icon icon = null;
 
 		float alpha = .625f;
 		Tessellator.instance.setBrightness(0xF000F0);
-		if(world.getBlock(x,y-1,z).getMaterial()==Material.water)
+		if(world.getBlockMaterial(x,y-1,z)==Material.water)
 		{
-			int col = world.getBlock(x,y-1,z).colorMultiplier(world, x,y-1,z);
+			int col = Block.blocksList[world.getBlockId(x,y-1,z)].colorMultiplier(world, x,y-1,z);
 			Tessellator.instance.setColorRGBA_F((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f, alpha);
-			icon = world.getBlock(x,y-1,z).getIcon(0,0);
+			icon = Block.blocksList[world.getBlockId(x,y-1,z)].getIcon(0,0);
 			if(icon!=null)
-				renderBlocks.renderFaceYPos(world.getBlock(x,y-1,z), x,y-1,z, icon);
+				renderBlock.renderFaceYPos(Block.blocksList[world.getBlockId(x,y-1,z)], x,y-1,z, icon);
 		}
-		if(world.getBlock(x,y+1,z).getMaterial()==Material.water)
+		if(world.getBlockMaterial(x,y+1,z)==Material.water)
 		{
-			int col = world.getBlock(x,y+1,z).colorMultiplier(world, x,y+1,z);
+			int col = Block.blocksList[world.getBlockId(x,y+1,z)].colorMultiplier(world, x,y+1,z);
 			Tessellator.instance.setColorRGBA_F((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f, alpha);
-			icon = world.getBlock(x,y+1,z).getIcon(0,0);
+			icon = Block.blocksList[world.getBlockId(x,y+1,z)].getIcon(0,0);
 			if(icon!=null)
-				renderBlocks.renderFaceYNeg(world.getBlock(x,y+1,z), x,y+1,z, icon);
+				renderBlock.renderFaceYNeg(Block.blocksList[world.getBlockId(x,y+1,z)], x,y+1,z, icon);
 		}
-		if(world.getBlock(x,y,z-1).getMaterial()==Material.water)
+		if(world.getBlockMaterial(x,y,z-1)==Material.water)
 		{
-			int col = world.getBlock(x,y,z-1).colorMultiplier(world, x,y,z-1);
+			int col = Block.blocksList[world.getBlockId(x,y,z-1)].colorMultiplier(world, x,y,z-1);
 			Tessellator.instance.setColorRGBA_F((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f, alpha);
-			icon = world.getBlock(x,y,z-1).getIcon(0,0);
+			icon = Block.blocksList[world.getBlockId(x,y,z-1)].getIcon(0,0);
 			if(icon!=null)
-				renderBlocks.renderFaceZPos(world.getBlock(x,y,z-1), x,y,z-1, icon);
+				renderBlock.renderFaceZPos(Block.blocksList[world.getBlockId(x,y,z-1)], x,y,z-1, icon);
 		}
-		if(world.getBlock(x,y,z+1).getMaterial()==Material.water)
+		if(world.getBlockMaterial(x,y,z+1)==Material.water)
 		{
-			int col = world.getBlock(x,y,z+1).colorMultiplier(world, x,y,z+1);
+			int col = Block.blocksList[world.getBlockId(x,y,z+1)].colorMultiplier(world, x,y,z+1);
 			Tessellator.instance.setColorRGBA_F((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f, alpha);
-			icon = world.getBlock(x,y,z+1).getIcon(0,0);
+			icon = Block.blocksList[world.getBlockId(x,y,z+1)].getIcon(0,0);
 			if(icon!=null)
-				renderBlocks.renderFaceZNeg(world.getBlock(x,y,z+1), x,y,z+1, icon);
+				renderBlock.renderFaceZNeg(Block.blocksList[world.getBlockId(x,y,z+1)], x,y,z+1, icon);
 		}
-		if(world.getBlock(x-1,y,z).getMaterial()==Material.water)
+		if(world.getBlockMaterial(x-1,y,z)==Material.water)
 		{
-			int col = world.getBlock(x-1,y,z).colorMultiplier(world, x-1,y,z);
+			int col = Block.blocksList[world.getBlockId(x-1,y,z)].colorMultiplier(world, x-1,y,z);
 			Tessellator.instance.setColorRGBA_F((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f, alpha);
-			icon = world.getBlock(x-1,y,z).getIcon(0,0);
+			icon = Block.blocksList[world.getBlockId(x-1,y,z)].getIcon(0,0);
 			if(icon!=null)
-				renderBlocks.renderFaceXPos(world.getBlock(x-1,y,z), x-1,y,z, icon);
+				renderBlock.renderFaceXPos(Block.blocksList[world.getBlockId(x-1,y,z)], x-1,y,z, icon);
 		}
-		if(world.getBlock(x+1,y,z).getMaterial()==Material.water)
+		if(world.getBlockMaterial(x+1,y,z)==Material.water)
 		{
-			int col = world.getBlock(x+1,y,z).colorMultiplier(world, x+1,y,z);
+			int col = Block.blocksList[world.getBlockId(x+1,y,z)].colorMultiplier(world, x+1,y,z);
 			Tessellator.instance.setColorRGBA_F((col>>16&255)/255f, (col>>8&255)/255f, (col&255)/255f, alpha);
-			icon = world.getBlock(x+1,y,z).getIcon(0,0);
+			icon = Block.blocksList[world.getBlockId(x+1,y,z)].getIcon(0,0);
 			if(icon!=null)
-				renderBlocks.renderFaceXNeg(world.getBlock(x+1,y,z), x+1,y,z, icon);
+				renderBlock.renderFaceXNeg(Block.blocksList[world.getBlockId(x+1,y,z)], x+1,y,z, icon);
 		}
-		renderBlocks.enableAO = ao;
+		renderBlock.enableAO = ao;
 	}
 
 }

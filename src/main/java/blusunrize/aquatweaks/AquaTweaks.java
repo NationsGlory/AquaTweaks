@@ -2,7 +2,7 @@ package blusunrize.aquatweaks;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 import blusunrize.aquatweaks.proxy.CommonProxy;
 
@@ -39,8 +39,12 @@ public class AquaTweaks
 	{
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
-		tweakGlass = config.getBoolean("tweaks", "tweakGlass", tweakGlass, "Set to false to re-enable water rendering its sides towards glass");
-		manualTweaks = config.getStringList("tweaks", "manualTweaks", manualTweaks, "This string array can be used to add blocks manually to AquaTweaks. Note that these need to be the proper registry names. The cobblestone wall added here can also be removed. They are optional but might be useful for people who use the walls as pillars or something.");
+		tweakGlass = config.get("tweaks", "tweakGlass", "Set to false to re-enable water rendering its sides towards glass").getBoolean(tweakGlass);
+		String[] mT = config.get("tweaks", "manualTweaks", "This string array can be used to add blocks manually to AquaTweaks. Note that these need to be the proper registry names. The cobblestone wall added here can also be removed. They are optional but might be useful for people who use the walls as pillars or something.").getStringList();
+
+		if(mT != null)
+			manualTweaks = mT;
+
 		config.save();
 	}
 	@Mod.EventHandler
@@ -61,7 +65,9 @@ public class AquaTweaks
 				}catch(NumberFormatException e){}
 			}
 
-			Object b = (Block) Block.blockRegistry.getObject(s);
+			System.out.println(s);
+
+			Object b = GameRegistry.findBlock("minecraft", s);
 			if(b!=null && b instanceof Block)
 				FluidUtils.addBlockToValidConnectables((Block)b, meta);
 			else
@@ -76,7 +82,7 @@ public class AquaTweaks
 			if(message.key.equals("registerAquaConnectable"))
 			{
 				NBTTagCompound tag = message.getNBTValue();
-				if(tag!=null && tag.hasKey("modid",8) && tag.hasKey("block",8))
+				if(tag!=null && tag.hasKey("modid") && tag.hasKey("block"))
 				{
 					Block b = GameRegistry.findBlock(tag.getString("modid"), tag.getString("block"));
 					int meta = !tag.hasKey("meta")?OreDictionary.WILDCARD_VALUE: tag.getInteger("meta");

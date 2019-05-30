@@ -3,9 +3,9 @@ package blusunrize.aquatweaks;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.world.ChunkCache;
-import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.event.Event;
 
 /**
  * An event that is fired during block rendering, rather than before and after.

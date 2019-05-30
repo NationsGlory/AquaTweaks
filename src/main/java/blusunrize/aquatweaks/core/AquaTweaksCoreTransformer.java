@@ -21,13 +21,15 @@ import blusunrize.aquatweaks.FluidUtils;
 import blusunrize.aquatweaks.RenderWorldEventMid;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
+import static blusunrize.aquatweaks.FluidUtils.blockIsOpaque;
+
 public class AquaTweaksCoreTransformer implements IClassTransformer
 {
 	@Override
 	public byte[] transform(String className, String newClassName, byte[] origCode)
 	{
 		//patch shouldSideBeRendered in BlockLiquid
-		if(className.equals("net.minecraft.block.BlockLiquid")||className.equals("alw"))
+		if(className.equals("net.minecraft.block.BlockFluid")||className.equals("apc"))
 		{
 			ATLog.info("Patching 'shouldSideBeRendered'");
 			ClassReader rd = new ClassReader(origCode);
@@ -38,7 +40,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 		}
 
 		//add custom render hook
-		if(className.equals("net.minecraft.client.renderer.WorldRenderer")||className.equals("blo"))
+		if(className.equals("net.minecraft.client.renderer.WorldRenderer")||className.equals("bfa"))
 		{
 			ATLog.info("Adding custom world render hook");
 			ClassReader rd = new ClassReader(origCode);
@@ -67,8 +69,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 				mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 						"blusunrize/aquatweaks/core/AquaTweaksCoreTransformer",
 						"fireMidRenderEvent",
-							"(Lnet/minecraft/client/renderer/WorldRenderer;I)V",
-								false);
+							"(Lnet/minecraft/client/renderer/WorldRenderer;I)V");
 			}
 			super.visitInsn(opcode);
 		}
@@ -117,17 +118,17 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 		public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 		{
 			final String methodToPatch = "shouldSideBeRendered";
-			final String methodToPatch_srg = "func_149646_a";
+			final String methodToPatch_srg = "func_71877_c";
 			final String methodToPatch_obf = "a";
 			final String qdesc = "(Lnet/minecraft/world/IBlockAccess;IIII)Z";
-			final String qdesc_obf = "(Lahl;IIII)Z";
+			final String qdesc_obf = "(Lacf;IIII)Z";
 			final String qdescInv = "(Lnet/minecraft/block/Block;Lnet/minecraft/world/IBlockAccess;IIII)Z";
-			final String qdescInv_obf = "(Laji;Lahl;IIII)Z";
+			final String qdescInv_obf = "(Laqz;Lacf;IIII)Z";
 
 			if((name.equals(methodToPatch)||name.equals(methodToPatch_srg)||name.equals(methodToPatch_obf))
 					&&(desc.equals(qdesc)||desc.equals(qdesc_obf)))
 			{
-				final String invokeDesc = desc.equals(desc)?qdescInv:qdescInv_obf;
+				final String invokeDesc = desc.equals(qdesc)?qdescInv:qdescInv_obf;
 
 				return new MethodVisitor(Opcodes.ASM4, super.visitMethod(access, name, desc, signature, exceptions))
 				{
@@ -143,7 +144,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 						mv.visitVarInsn(Opcodes.ILOAD, 4);
 						mv.visitVarInsn(Opcodes.ILOAD, 5);
 						mv.visitMethodInsn(Opcodes.INVOKESTATIC, "blusunrize/aquatweaks/core/AquaTweaksCoreTransformer", "liquid_shouldSideBeRendered",
-								invokeDesc, false);
+								invokeDesc);
 						mv.visitInsn(Opcodes.IRETURN);
 						mv.visitMaxs(5, 1);
 						mv.visitEnd();
@@ -156,11 +157,10 @@ public class AquaTweaksCoreTransformer implements IClassTransformer
 	public static boolean liquid_shouldSideBeRendered(Block block, IBlockAccess world, int x, int y, int z, int side)
 	{
 		if(side>=0 && side<6)
-			if(FluidUtils.canFluidConnectToBlock(world, x, y, z, side, block.getMaterial()))
+			if(FluidUtils.canFluidConnectToBlock(world, x, y, z, side, block.blockMaterial))
 //			if(world.getBlock(x, y, z) instanceof IAquaConnectable && ((IAquaConnectable)world.getBlock(x, y, z)).canConnectTo(world, x, y, z, ForgeDirection.OPPOSITES[side]) && FluidUtils.isBlockSubmerged(world, x, y, z, Material.water))
 				return false;
-		Material material = world.getBlock(x, y, z).getMaterial();
-		return material == block.getMaterial() ? false : (side == 1 ? true : 
-			side==0&&block.getBlockBoundsMinY()>0?true: (side==1&&block.getBlockBoundsMaxY()<1?true: (side==2&&block.getBlockBoundsMinZ()>0?true: (side==3&&block.getBlockBoundsMaxZ()<1?true: (side==4&&block.getBlockBoundsMinX()>0?true: (side==5&&block.getBlockBoundsMaxX()<1?true : !world.getBlock(x,y,z).isOpaqueCube()))))));
+		Material material = world.getBlockMaterial(x, y, z);
+		return material != block.blockMaterial && (side == 1 || side == 0 && block.getBlockBoundsMinY() > 0 || (side == 2 && block.getBlockBoundsMinZ() > 0 || (side == 3 && block.getBlockBoundsMaxZ() < 1 || (side == 4 && block.getBlockBoundsMinX() > 0 || (side == 5 && block.getBlockBoundsMaxX() < 1 || !blockIsOpaque(world, x,y,z))))));
 	}
 }
