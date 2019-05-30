@@ -10,7 +10,6 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -25,39 +24,15 @@ public class FluidUtils
 	{
 		validConnectables.put(block, meta);
 	}
-	public static void addDefaultConnectables()
-	{
-		addBlockToValidConnectables(Block.ladder,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.fenceIron,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.skull,OreDictionary.WILDCARD_VALUE);
-		//Buttons and levers get washed away, but at least it looks good
-		addBlockToValidConnectables(Block.stoneButton,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.stoneButton,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.lever,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.hopperBlock,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.pressurePlateStone,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.pressurePlatePlanks,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.pressurePlateIron,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.pressurePlateGold,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.anvil,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.fence,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.fenceGate,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.netherFence,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.signWall,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.signPost,OreDictionary.WILDCARD_VALUE);
+	public static void addDefaultConnectables() {
 
-		//These would usually get flushed away, but Vazkii's Waterproof fixes that
-		addBlockToValidConnectables(Block.redstoneWire,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.torchRedstoneActive,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.torchRedstoneIdle,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.redstoneRepeaterIdle,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.redstoneRepeaterActive,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.redstoneComparatorIdle,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.redstoneComparatorActive,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.rail,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.railPowered,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.railDetector,OreDictionary.WILDCARD_VALUE);
-		addBlockToValidConnectables(Block.railActivator,OreDictionary.WILDCARD_VALUE);
+	    for(Block block : Block.blocksList)
+        {
+            if(block != null && !block.isOpaqueCube()) {
+                addBlockToValidConnectables(block, OreDictionary.WILDCARD_VALUE);
+            }
+        }
+
 	}
 
 	public static Vec3 getFlowVector(IBlockAccess world, int x, int y, int z, Material mat)
@@ -452,7 +427,7 @@ public class FluidUtils
 					)
 				//						&& getFluidHeight(world,x+fd.offsetX,y+fd.offsetY,z+fd.offsetZ,material)<.0625)
 				return true;
-		}	
+		}
 		return false;
 	}
 
