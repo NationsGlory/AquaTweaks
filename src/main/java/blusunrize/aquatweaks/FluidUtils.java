@@ -11,7 +11,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.HashMap;
@@ -279,7 +278,6 @@ public class FluidUtils {
         }
         //BOTTOM
         if (!canFakeFluidConnectToBlock(world, x, y - 1, z, 0, material)) {
-            float mod = .5f;
             tes.setBrightness(block.getMixedBrightnessForBlock(renderer.blockAccess, x, y - 1, z));
             tes.setColorOpaque_F(col01[0], col01[1], col01[2]);
             tes.addVertexWithUV(x, y + depth01, z + 1, d8, d16);

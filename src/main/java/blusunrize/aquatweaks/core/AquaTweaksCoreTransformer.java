@@ -1,20 +1,9 @@
 package blusunrize.aquatweaks.core;
 
 import blusunrize.aquatweaks.ATLog;
-import blusunrize.aquatweaks.FluidUtils;
-import blusunrize.aquatweaks.RenderWorldEventMid;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.world.ChunkCache;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.MinecraftForge;
 import org.objectweb.asm.*;
-
-import static blusunrize.aquatweaks.FluidUtils.blockIsOpaque;
+import org.objectweb.asm.tree.*;
 
 public class AquaTweaksCoreTransformer implements IClassTransformer {
     @Override
@@ -37,6 +26,28 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
             ClassVisitor patcher = new Visitor_RenderEvent(wr);
             rd.accept(patcher, ClassReader.EXPAND_FRAMES);
             return wr.toByteArray();
+        }
+
+        if (className.equals("net.minecraft.entity.Entity") || className.equals("nn")) {
+            ClassReader classReader = new ClassReader(origCode);
+            ClassNode classNode = new ClassNode();
+            classReader.accept(classNode, 0);
+
+            for (MethodNode methodNode : classNode.methods) {
+                if (methodNode.name.equals("isInsideOfMaterial") || (methodNode.name.equals("a") && methodNode.desc.equals("(Lakc;)Z"))) {
+                    boolean dev = methodNode.name.equals("isInsideOfMaterial");
+                    InsnList insnList = methodNode.instructions;
+                    insnList.clear();
+                    insnList.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                    insnList.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                    insnList.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "blusunrize/aquatweaks/CommonEvent", "isInsideOfMaterial", dev ? "(Lnet/minecraft/entity/Entity;Lnet/minecraft/block/material/Material;)Z" : "(Lnn;Lakc;)Z"));
+                    insnList.add(new InsnNode(Opcodes.IRETURN));
+                }
+            }
+
+            ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
+            classNode.accept(classWriter);
+            return classWriter.toByteArray();
         }
         return origCode;
     }
@@ -61,7 +72,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", dev ? "posZ" : "field_78921_e", "I");
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC,
-                        "blusunrize/aquatweaks/core/AquaTweaksCoreTransformer",
+                        "blusunrize/aquatweaks/AquaEventHandler",
                         "fireMidRenderEvent",
                         "(Lnet/minecraft/client/renderer/WorldRenderer;Lnet/minecraft/client/renderer/RenderBlocks;IIII)V");
             }
@@ -88,12 +99,6 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
             }
             return super.visitMethod(access, name, desc, signature, exceptions);
         }
-    }
-
-    public static void fireMidRenderEvent(WorldRenderer wr, RenderBlocks rb, int pass, int posX, int posY, int posZ) {
-        Tessellator.instance.setTranslation((double) (-posX), (double) (-posY), (double) (-posZ));
-        if (rb != null && rb.blockAccess instanceof ChunkCache)
-            MinecraftForge.EVENT_BUS.post(new RenderWorldEventMid(wr, (ChunkCache) rb.blockAccess, rb, pass));
     }
 
 
@@ -127,7 +132,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
                         mv.visitVarInsn(Opcodes.ILOAD, 3);
                         mv.visitVarInsn(Opcodes.ILOAD, 4);
                         mv.visitVarInsn(Opcodes.ILOAD, 5);
-                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, "blusunrize/aquatweaks/core/AquaTweaksCoreTransformer", "liquid_shouldSideBeRendered",
+                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, "blusunrize/aquatweaks/AquaEventHandler", "liquid_shouldSideBeRendered",
                                 invokeDesc);
                         mv.visitInsn(Opcodes.IRETURN);
                         mv.visitMaxs(5, 1);
@@ -139,12 +144,5 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
         }
     }
 
-    public static boolean liquid_shouldSideBeRendered(Block block, IBlockAccess world, int x, int y, int z, int side) {
-        if (side >= 0 && side < 6)
-            if (FluidUtils.canFluidConnectToBlock(world, x, y, z, side, block.blockMaterial))
-//			if(world.getBlock(x, y, z) instanceof IAquaConnectable && ((IAquaConnectable)world.getBlock(x, y, z)).canConnectTo(world, x, y, z, ForgeDirection.OPPOSITES[side]) && FluidUtils.isBlockSubmerged(world, x, y, z, Material.water))
-                return false;
-        Material material = world.getBlockMaterial(x, y, z);
-        return material != block.blockMaterial && (side == 1 || side == 0 && block.getBlockBoundsMinY() > 0 || (side == 2 && block.getBlockBoundsMinZ() > 0 || (side == 3 && block.getBlockBoundsMaxZ() < 1 || (side == 4 && block.getBlockBoundsMinX() > 0 || (side == 5 && block.getBlockBoundsMaxX() < 1 || !blockIsOpaque(world, x, y, z))))));
-    }
+
 }

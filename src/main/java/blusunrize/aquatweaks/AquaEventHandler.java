@@ -2,17 +2,24 @@ package blusunrize.aquatweaks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.ChunkCache;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import org.lwjgl.opengl.GL11;
+
+import static blusunrize.aquatweaks.FluidUtils.blockIsOpaque;
 
 public class AquaEventHandler
 {
@@ -36,7 +43,7 @@ public class AquaEventHandler
 						int y = event.renderer.posY+yy;
 						int z = event.renderer.posZ+zz;
 						if(FluidUtils.shouldRenderAquaConnectable(event.chunkCache, x,y,z))
-							FluidUtils.tessellateFluidBlock(event.renderBlocks.blockAccess, x,y,z, event.renderBlocks, Tessellator.instance);
+							FluidUtils.tessellateFluidBlock(event.renderBlocks.blockAccess, x, y, z, event.renderBlocks, Tessellator.instance);
 						if(AquaTweaks.tweakGlass && event.chunkCache.getBlockMaterial(x,y,z)==Material.glass)
 							FluidUtils.renderTowardsGlass(event.chunkCache, x,y,z, event.renderBlocks);
 					}
@@ -83,20 +90,35 @@ public class AquaEventHandler
 		}
 	}
 
-	private static boolean isInFakeWater(EntityLivingBase living)
+	public static boolean isInFakeWater(Entity entity)
 	{
 		for (int i = 0; i < 8; ++i)
 		{
-			float f = ((float)((i >> 0) % 2) - 0.5F) * living.width * 0.8F;
+			float f = ((float)((i >> 0) % 2) - 0.5F) * entity.width * 0.8F;
 			float f1 = ((float)((i >> 1) % 2) - 0.5F) * 0.1F;
-			float f2 = ((float)((i >> 2) % 2) - 0.5F) * living.width * 0.8F;
-			int x = MathHelper.floor_double(living.posX + f);
-			int y = MathHelper.floor_double(living.posY + living.getEyeHeight()+f1);
-			int z = MathHelper.floor_double(living.posZ + f2);
+			float f2 = ((float)((i >> 2) % 2) - 0.5F) * entity.width * 0.8F;
+			int x = MathHelper.floor_double(entity.posX + f);
+			int y = MathHelper.floor_double(entity.posY + entity.getEyeHeight()+f1);
+			int z = MathHelper.floor_double(entity.posZ + f2);
 
-			if(FluidUtils.shouldRenderAquaConnectable(living.worldObj, x,y,z) && FluidUtils.getFakeFillMaterial(living.worldObj, x, y, z)==Material.water)
+			if(FluidUtils.shouldRenderAquaConnectable(entity.worldObj, x,y,z) && FluidUtils.getFakeFillMaterial(entity.worldObj, x, y, z)==Material.water)
 				return true;
 		}
 		return false;
+	}
+
+	public static boolean liquid_shouldSideBeRendered(Block block, IBlockAccess world, int x, int y, int z, int side) {
+		if (side >= 0 && side < 6)
+			if (FluidUtils.canFluidConnectToBlock(world, x, y, z, side, block.blockMaterial))
+//			if(world.getBlock(x, y, z) instanceof IAquaConnectable && ((IAquaConnectable)world.getBlock(x, y, z)).canConnectTo(world, x, y, z, ForgeDirection.OPPOSITES[side]) && FluidUtils.isBlockSubmerged(world, x, y, z, Material.water))
+				return false;
+		Material material = world.getBlockMaterial(x, y, z);
+		return material != block.blockMaterial && (side == 1 || side == 0 && block.getBlockBoundsMinY() > 0 || (side == 2 && block.getBlockBoundsMinZ() > 0 || (side == 3 && block.getBlockBoundsMaxZ() < 1 || (side == 4 && block.getBlockBoundsMinX() > 0 || (side == 5 && block.getBlockBoundsMaxX() < 1 || !blockIsOpaque(world, x, y, z))))));
+	}
+
+	public static void fireMidRenderEvent(WorldRenderer wr, RenderBlocks rb, int pass, int posX, int posY, int posZ) {
+		Tessellator.instance.setTranslation((double) (-posX), (double) (-posY), (double) (-posZ));
+		if (rb != null && rb.blockAccess instanceof ChunkCache)
+			MinecraftForge.EVENT_BUS.post(new RenderWorldEventMid(wr, (ChunkCache) rb.blockAccess, rb, pass));
 	}
 }
