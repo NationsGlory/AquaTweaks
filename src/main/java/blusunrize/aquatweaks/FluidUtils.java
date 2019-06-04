@@ -102,8 +102,6 @@ public class FluidUtils {
 
             if (world.getBlockMaterial(j1, y + 1, k1) == mat)
                 return 1F;
-            if (canConnectAquaConnectable(world, j1, y + 1, k1, 0) && (getFluidHeight(world, j1, y + 1, k1, mat) > 0 || getFluidHeight(world, j1 + 1, y + 1, k1, mat) > 0 || getFluidHeight(world, j1 + 1, y + 1, k1 + 1, mat) > 0 || getFluidHeight(world, j1, y + 1, k1 + 1, mat) > 0))
-                return 1f;
 
             Material material1 = world.getBlockMaterial(j1, y, k1);
             if (material1 == mat) {
@@ -189,6 +187,7 @@ public class FluidUtils {
             if (height00 < .0625 && height01 < .0625 && height11 < .0625 && height10 < .0625)
                 return;
         }
+
 
         double depth00 = 0;
         double depth01 = 0;
