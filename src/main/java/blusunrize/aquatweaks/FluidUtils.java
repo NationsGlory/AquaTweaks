@@ -11,6 +11,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class FluidUtils {
     public static void addDefaultConnectables() {
 
         for (Block block : Block.blocksList) {
-            if (block != null && !block.isOpaqueCube() && block.blockMaterial != Material.water) {
+            if (block != null && !block.isOpaqueCube() && block.blockMaterial != Material.water && !(block instanceof BlockFluidBase)) {
                 addBlockToValidConnectables(block, OreDictionary.WILDCARD_VALUE);
             }
         }
