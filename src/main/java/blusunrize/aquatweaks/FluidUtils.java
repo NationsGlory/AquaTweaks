@@ -77,8 +77,6 @@ public class FluidUtils {
         int l = 0;
         float f = 0.0F;
 
-        if(canConnectAquaConnectable(world, x,y+1,z, 0) && (getFluidHeight(world,x,y+1,z,mat)>0||getFluidHeight(world,x+1,y+1,z,mat)>0||getFluidHeight(world,x+1,y+1,z+1,mat)>0||getFluidHeight(world,x,y+1,z+1,mat)>0))
-            return 1f;
         for(int i1 = 0; i1 < 4; ++i1)
         {
             int j1 = x - (i1 & 1);
@@ -86,8 +84,6 @@ public class FluidUtils {
 
             if (world.getBlockMaterial(j1, y + 1, k1)==mat)
                 return 1F;
-            if(canConnectAquaConnectable(world, j1,y+1,k1, 0) && (getFluidHeight(world,j1,y+1,k1,mat)>0||getFluidHeight(world,j1+1,y+1,k1,mat)>0||getFluidHeight(world,j1+1,y+1,k1+1,mat)>0||getFluidHeight(world,j1,y+1,k1+1,mat)>0))
-                return 1f;
 
             Material material1 = world.getBlockMaterial(j1, y, k1);
             if(material1==mat)
@@ -336,7 +332,7 @@ public class FluidUtils {
 
     public static boolean blockIsOpaque(IBlockAccess world, int x, int y, int z) {
         int id = world.getBlockId(x, y, z);
-        return id == 0 || Block.blocksList[id].isOpaqueCube();
+        return id != 0 && Block.blocksList[id].isOpaqueCube();
     }
 
     private static boolean isValidConnectable(Block block)
