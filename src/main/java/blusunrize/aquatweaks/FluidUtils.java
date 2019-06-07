@@ -18,21 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FluidUtils {
-    public static HashMap<Block, Integer> validConnectables = new HashMap<Block, Integer>();
-
-    public static void addBlockToValidConnectables(Block block, int meta) {
-        validConnectables.put(block, meta);
-    }
-
-    public static void addDefaultConnectables() {
-
-        for (Block block : Block.blocksList) {
-            if (block != null && !block.isOpaqueCube() && block.blockMaterial != Material.water && !(block instanceof BlockFluidBase)) {
-                addBlockToValidConnectables(block, OreDictionary.WILDCARD_VALUE);
-            }
-        }
-
-    }
 
     public static Vec3 getFlowVector(IBlockAccess world, int x, int y, int z, Material mat) {
         Vec3 vec3 = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
@@ -342,7 +327,12 @@ public class FluidUtils {
 
     public static boolean blockIsOpaque(IBlockAccess world, int x, int y, int z) {
         int id = world.getBlockId(x, y, z);
-        return id != 0 && Block.blocksList[id].isOpaqueCube();
+        return id == 0 || Block.blocksList[id].isOpaqueCube();
+    }
+
+    private static boolean isValidConnectable(Block block)
+    {
+        return block != null && !block.isOpaqueCube() && block.blockMaterial != Material.water && !(block instanceof BlockFluidBase);
     }
 
     public static boolean canConnectAquaConnectable(IBlockAccess world, int x, int y, int z, int side) {
@@ -351,9 +341,7 @@ public class FluidUtils {
             Block b = Block.blocksList[id];
             if (b instanceof IAquaConnectable && ((IAquaConnectable) b).canConnectTo(world, x, y, z, side))
                 return true;
-            for (Map.Entry<Block, Integer> e : validConnectables.entrySet())
-                if (e.getKey() == b && (e.getValue() == OreDictionary.WILDCARD_VALUE || e.getValue() == world.getBlockMetadata(x, y, z)))
-                    return true;
+            return isValidConnectable(b);
         }
         return false;
     }
@@ -364,9 +352,7 @@ public class FluidUtils {
             Block b = Block.blocksList[id];
             if (b instanceof IAquaConnectable && ((IAquaConnectable) b).shouldRenderFluid(world, x, y, z))
                 return true;
-            for (Map.Entry<Block, Integer> e : validConnectables.entrySet())
-                if (e.getKey() == b && (e.getValue() == OreDictionary.WILDCARD_VALUE || e.getValue() == world.getBlockMetadata(x, y, z)))
-                    return true;
+            return isValidConnectable(b);
         }
         return false;
     }

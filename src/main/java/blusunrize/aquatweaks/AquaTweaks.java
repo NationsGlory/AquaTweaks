@@ -52,43 +52,4 @@ public class AquaTweaks
 	{
 		proxy.registerHandlers();
 	}
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{
-		ImmutableList<FMLInterModComms.IMCMessage> messages = FMLInterModComms.fetchRuntimeMessages(this);
-		for(FMLInterModComms.IMCMessage message : messages)
-			if(message.key.equals("registerAquaConnectable"))
-			{
-				NBTTagCompound tag = message.getNBTValue();
-				if(tag!=null && tag.hasKey("modid") && tag.hasKey("block"))
-				{
-					Block b = GameRegistry.findBlock(tag.getString("modid"), tag.getString("block"));
-					int meta = !tag.hasKey("meta")?OreDictionary.WILDCARD_VALUE: tag.getInteger("meta");
-					FluidUtils.addBlockToValidConnectables(b, meta);
-				}
-			}
-
-		FluidUtils.addDefaultConnectables();
-		for(String s : manualTweaks)
-		{
-			int meta = OreDictionary.WILDCARD_VALUE;
-			int li = s.lastIndexOf(":");
-			if(li!=-1)
-			{
-				try{
-					int m = Integer.parseInt(s.substring(li));
-					meta = m;
-					s = s.substring(0,li);
-				}catch(NumberFormatException e){}
-			}
-
-			System.out.println(s);
-
-			Object b = GameRegistry.findBlock("minecraft", s);
-			if(b!=null && b instanceof Block)
-				FluidUtils.addBlockToValidConnectables((Block)b, meta);
-			else
-				ATLog.info("Failed to register '"+s+"'; not a valid block identifier.");
-		}
-	}
 }
