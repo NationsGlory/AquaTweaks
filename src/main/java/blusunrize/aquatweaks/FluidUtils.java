@@ -59,12 +59,12 @@ public class FluidUtils {
                     delay2 = getEffectiveFlowDelay(world, xx, y - 1, zz, mat);
                     if (delay2 >= 0) {
                         i2 = delay2 - (flowDelay - 8);
-                        vec3 = vec3.addVector(((xx - x) * i2), ((y - y) * i2), ((zz - z) * i2));
+                        vec3 = vec3.addVector(((xx - x) * i2), (0), ((zz - z) * i2));
                     }
                 }
-            } else if (delay2 >= 0) {
+            } else {
                 i2 = delay2 - flowDelay;
-                vec3 = vec3.addVector(((xx - x) * i2), ((y - y) * i2), ((zz - z) * i2));
+                vec3 = vec3.addVector(((xx - x) * i2), (0), ((zz - z) * i2));
             }
         }
 
@@ -95,14 +95,9 @@ public class FluidUtils {
         int l = 0;
         float f = 0.0F;
 
-        if (canConnectAquaConnectable(world, x, y + 1, z, 0) && (getFluidHeight(world, x, y + 1, z, mat) > 0 || getFluidHeight(world, x + 1, y + 1, z, mat) > 0 || getFluidHeight(world, x + 1, y + 1, z + 1, mat) > 0 || getFluidHeight(world, x, y + 1, z + 1, mat) > 0))
-            return 1f;
         for (int i1 = 0; i1 < 4; ++i1) {
             int j1 = x - (i1 & 1);
             int k1 = z - (i1 >> 1 & 1);
-
-            if (world.getBlockMaterial(j1, y + 1, k1) == mat)
-                return 1F;
 
             Material material1 = world.getBlockMaterial(j1, y, k1);
             if (material1 == mat) {
@@ -220,10 +215,10 @@ public class FluidUtils {
         int topColor = getColor(world, x, y, z);
         float[] colTop = {(topColor >> 16 & 255) / 255f, (topColor >> 8 & 255) / 255f, (topColor & 255) / 255f};
 
-        int colour00 = world.getBlockMaterial(x, y, z) == material ? Block.blocksList[world.getBlockId(x, y, z)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
-        int colour01 = world.getBlockMaterial(x, y, z + 1) == material ? Block.blocksList[world.getBlockId(x, y, z + 1)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
-        int colour11 = world.getBlockMaterial(x + 1, y, z + 1) == material ? Block.blocksList[world.getBlockId(x + 1, y, z + 1)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
-        int colour10 = world.getBlockMaterial(x + 1, y, z) == material ? Block.blocksList[world.getBlockId(x + 1, y, z)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
+        int colour00 = world.getBlockMaterial(x - 1, y, z) == material ? Block.blocksList[world.getBlockId(x - 1, y, z)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
+        int colour01 = world.getBlockMaterial(x, y, z - 1) == material ? Block.blocksList[world.getBlockId(x, y, z - 1)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
+        int colour11 = world.getBlockMaterial(x + 1, y, z) == material ? Block.blocksList[world.getBlockId(x + 1, y, z)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
+        int colour10 = world.getBlockMaterial(x, y, z + 1) == material ? Block.blocksList[world.getBlockId(x, y, z + 1)].colorMultiplier(renderer.blockAccess, x + 1, y, z) : 0xffffff;
         float[] col00 = {(colour00 >> 16 & 255) / 255f, (colour00 >> 8 & 255) / 255f, (colour00 & 255) / 255f};
         float[] col01 = {(colour01 >> 16 & 255) / 255f, (colour01 >> 8 & 255) / 255f, (colour01 & 255) / 255f};
         float[] col11 = {(colour11 >> 16 & 255) / 255f, (colour11 >> 8 & 255) / 255f, (colour11 & 255) / 255f};
@@ -272,8 +267,11 @@ public class FluidUtils {
             tes.setBrightness(block.getMixedBrightnessForBlock(renderer.blockAccess, x, y, z));
             tes.setColorOpaque_F(col00[0], col00[1], col00[2]);
             tes.addVertexWithUV(x, y + height00, z, d7, d14);
+            tes.setColorOpaque_F(col01[0], col01[1], col01[2]);
             tes.addVertexWithUV(x, y + height01, z + 1, d8, d16);
+            tes.setColorOpaque_F(col11[0], col11[1], col11[2]);
             tes.addVertexWithUV(x + 1, y + height11, z + 1, d10, d18);
+            tes.setColorOpaque_F(col10[0], col10[1], col10[2]);
             tes.addVertexWithUV(x + 1, y + height10, z, d12, d20);
         }
         //BOTTOM
@@ -281,8 +279,11 @@ public class FluidUtils {
             tes.setBrightness(block.getMixedBrightnessForBlock(renderer.blockAccess, x, y - 1, z));
             tes.setColorOpaque_F(col01[0], col01[1], col01[2]);
             tes.addVertexWithUV(x, y + depth01, z + 1, d8, d16);
+            tes.setColorOpaque_F(col00[0], col00[1], col00[2]);
             tes.addVertexWithUV(x, y + depth00, z, d7, d14);
+            tes.setColorOpaque_F(col10[0], col10[1], col10[2]);
             tes.addVertexWithUV(x + 1, y + depth10, z, d12, d20);
+            tes.setColorOpaque_F(col11[0], col11[1], col11[2]);
             tes.addVertexWithUV(x + 1, y + depth11, z + 1, d10, d18);
         }
 
