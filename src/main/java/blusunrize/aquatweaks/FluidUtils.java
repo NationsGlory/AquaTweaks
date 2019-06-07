@@ -12,10 +12,6 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.BlockFluidBase;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class FluidUtils {
 
@@ -76,29 +72,42 @@ public class FluidUtils {
         return vec3.xCoord == 0.0D && vec3.zCoord == 0.0D ? -1000.0D : Math.atan2(vec3.zCoord, vec3.xCoord) - (Math.PI / 2D);
     }
 
-    public static float getFluidHeight(IBlockAccess world, int x, int y, int z, Material mat) {
+    public static float getFluidHeight(IBlockAccess world, int x, int y, int z, Material mat)
+    {
         int l = 0;
         float f = 0.0F;
 
-        for (int i1 = 0; i1 < 4; ++i1) {
+        if(canConnectAquaConnectable(world, x,y+1,z, 0) && (getFluidHeight(world,x,y+1,z,mat)>0||getFluidHeight(world,x+1,y+1,z,mat)>0||getFluidHeight(world,x+1,y+1,z+1,mat)>0||getFluidHeight(world,x,y+1,z+1,mat)>0))
+            return 1f;
+        for(int i1 = 0; i1 < 4; ++i1)
+        {
             int j1 = x - (i1 & 1);
             int k1 = z - (i1 >> 1 & 1);
 
+            if (world.getBlockMaterial(j1, y + 1, k1)==mat)
+                return 1F;
+            if(canConnectAquaConnectable(world, j1,y+1,k1, 0) && (getFluidHeight(world,j1,y+1,k1,mat)>0||getFluidHeight(world,j1+1,y+1,k1,mat)>0||getFluidHeight(world,j1+1,y+1,k1+1,mat)>0||getFluidHeight(world,j1,y+1,k1+1,mat)>0))
+                return 1f;
+
             Material material1 = world.getBlockMaterial(j1, y, k1);
-            if (material1 == mat) {
+            if(material1==mat)
+            {
                 int l1 = world.getBlockMetadata(j1, y, k1);
-                if (l1 >= 8 || l1 == 0) {
+                if (l1 >= 8 || l1 == 0)
+                {
                     f += BlockFluid.getFluidHeightPercent(l1) * 10f;
                     l += 10;
                 }
                 f += BlockFluid.getFluidHeightPercent(l1);
                 ++l;
-            } else if (!material1.isSolid()) {
+            }
+            else if (!material1.isSolid())
+            {
                 ++f;
                 ++l;
             }
         }
-        return 1f - f / (float) l;
+        return 1f-f/(float)l;
     }
 
 
