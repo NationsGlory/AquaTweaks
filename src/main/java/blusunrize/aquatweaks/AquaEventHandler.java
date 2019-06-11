@@ -116,7 +116,6 @@ public class AquaEventHandler
 	}
 
 	public static void fireMidRenderEvent(WorldRenderer wr, RenderBlocks rb, int pass, int posX, int posY, int posZ) {
-		Tessellator.instance.setTranslation((double) (-posX), (double) (-posY), (double) (-posZ));
 		if (rb != null && rb.blockAccess instanceof ChunkCache)
 			MinecraftForge.EVENT_BUS.post(new RenderWorldEventMid(wr, (ChunkCache) rb.blockAccess, rb, pass));
 	}

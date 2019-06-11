@@ -6,9 +6,12 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.MCVersion("1.6.4")
 @IFMLLoadingPlugin.Name(AquaTweaksCoreLoader.NAME)
+@IFMLLoadingPlugin.SortingIndex(2002)
 public class AquaTweaksCoreLoader implements IFMLLoadingPlugin
 {
 	public static final String NAME = "AquaTweaks Core";
+	public static boolean optifine = false;
+
 	@Override
 	public String[] getASMTransformerClass()
 	{
@@ -27,5 +30,10 @@ public class AquaTweaksCoreLoader implements IFMLLoadingPlugin
 	@Override
 	public void injectData(Map<String, Object> data)
 	{
+		try {
+			Class.forName("optifine.OptiFineClassTransformer");
+			optifine = true;
+		} catch (ClassNotFoundException ignored) {
+		}
 	}
 }

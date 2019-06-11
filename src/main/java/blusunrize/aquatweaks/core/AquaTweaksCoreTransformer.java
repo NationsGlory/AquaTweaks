@@ -20,12 +20,58 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
 
         //add custom render hook
         if (className.equals("net.minecraft.client.renderer.WorldRenderer") || className.equals("bfa")) {
-            ATLog.info("Adding custom world render hook");
-            ClassReader rd = new ClassReader(origCode);
-            ClassWriter wr = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            ClassVisitor patcher = new Visitor_RenderEvent(wr);
-            rd.accept(patcher, ClassReader.EXPAND_FRAMES);
-            return wr.toByteArray();
+            ClassReader classReader = new ClassReader(origCode);
+            ClassNode classNode = new ClassNode();
+            classReader.accept(classNode, 0);
+
+            final String methodToPatch = "updateRenderer";
+            final String methodToPatch_srg = "func_78907_a";
+            final String methodToPatch_obf = "a";
+            final String qdesc = "()V";
+
+            for (MethodNode methodNode : classNode.methods) {
+                String name = methodNode.name;
+                if ((name.equals(methodToPatch) || name.equals(methodToPatch_srg) || name.equals(methodToPatch_obf) && methodNode.desc.equals(qdesc)))
+                {
+                    InsnList insnList = methodNode.instructions;
+                    for(AbstractInsnNode insnNode : insnList.toArray())
+                    {
+                        if(insnNode instanceof MethodInsnNode)
+                        {
+                            MethodInsnNode methodInsnNode = (MethodInsnNode) insnNode;
+                            System.out.println(methodInsnNode.owner+"/"+methodInsnNode.name+methodInsnNode.desc);
+                            if (((methodInsnNode.owner.equals("net/minecraft/client/renderer/Tessellator") && methodInsnNode.name.equals("setTranslation")) || (methodInsnNode.owner.equals("net/minecraft/client/renderer/Tessellator") && methodInsnNode.name.equals("func_78373_b"))) && methodInsnNode.desc.equals("(DDD)V")) {
+                                boolean dev = !methodInsnNode.name.equals("func_78373_b");
+
+                                AbstractInsnNode iD = new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                        "blusunrize/aquatweaks/AquaEventHandler",
+                                        "fireMidRenderEvent",
+                                       "(Lnet/minecraft/client/renderer/WorldRenderer;Lnet/minecraft/client/renderer/RenderBlocks;IIII)V");
+
+                                insnList.insert(insnNode, iD);
+
+                                insnList.insertBefore(iD, new VarInsnNode(Opcodes.ALOAD, 0));
+                                insnList.insertBefore(iD, new VarInsnNode(Opcodes.ALOAD, 10));
+                                if (AquaTweaksCoreLoader.optifine)
+                                    insnList.insertBefore(iD, new VarInsnNode(Opcodes.ILOAD, 13));
+                                else
+                                    insnList.insertBefore(iD, new VarInsnNode(Opcodes.ILOAD, 11));
+                                insnList.insertBefore(iD, new VarInsnNode(Opcodes.ALOAD, 0));
+                                insnList.insertBefore(iD, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", dev ? "posX" : "field_78923_c", "I"));
+                                insnList.insertBefore(iD, new VarInsnNode(Opcodes.ALOAD, 0));
+                                insnList.insertBefore(iD, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", dev ? "posY" : "field_78920_d", "I"));
+                                insnList.insertBefore(iD, new VarInsnNode(Opcodes.ALOAD, 0));
+                                insnList.insertBefore(iD, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", dev ? "posZ" : "field_78921_e", "I"));
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS);
+            classNode.accept(classWriter);
+            return classWriter.toByteArray();
         }
 
         if (className.equals("net.minecraft.entity.Entity") || className.equals("nn")) {
@@ -64,7 +110,10 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
                 boolean dev = !owner.equals("bfq");
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitVarInsn(Opcodes.ALOAD, 10);
-                mv.visitVarInsn(Opcodes.ILOAD, 11);
+                if (AquaTweaksCoreLoader.optifine)
+                    mv.visitVarInsn(Opcodes.ILOAD, 22);
+                else
+                    mv.visitVarInsn(Opcodes.ILOAD, 11);
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
                 mv.visitFieldInsn(Opcodes.GETFIELD, "net/minecraft/client/renderer/WorldRenderer", dev ? "posX" : "field_78923_c", "I");
                 mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -74,7 +123,7 @@ public class AquaTweaksCoreTransformer implements IClassTransformer {
                 mv.visitMethodInsn(Opcodes.INVOKESTATIC,
                         "blusunrize/aquatweaks/AquaEventHandler",
                         "fireMidRenderEvent",
-                        "(Lnet/minecraft/client/renderer/WorldRenderer;Lnet/minecraft/client/renderer/RenderBlocks;IIII)V");
+                        dev ? "(Lnet/minecraft/client/renderer/WorldRenderer;Lnet/minecraft/client/renderer/RenderBlocks;IIII)V" : "(Lbfa;Lbfr;IIII)V");
             }
             super.visitMethodInsn(opcode, owner, name, desc);
         }
