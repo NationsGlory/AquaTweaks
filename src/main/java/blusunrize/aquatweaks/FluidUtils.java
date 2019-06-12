@@ -265,7 +265,7 @@ public class FluidUtils {
             tes.addVertexWithUV(x + 1, y + height10, z, d12, d20);
         }
         //BOTTOM
-        if (!canFakeFluidConnectToBlock(world, x, y - 1, z, 0, material)) {
+        /*if (!canFakeFluidConnectToBlock(world, x, y - 1, z, 0, material)) {
             tes.setBrightness(block.getMixedBrightnessForBlock(renderer.blockAccess, x, y - 1, z));
             tes.setColorOpaque_F(col01[0], col01[1], col01[2]);
             tes.addVertexWithUV(x, y + depth01, z + 1, d8, d16);
@@ -318,16 +318,16 @@ public class FluidUtils {
                 tes.addVertexWithUV(xMin, y + h0, zMin, f8, f10);
                 tes.addVertexWithUV(xMin, y + d0, zMin, f8, f12);
             }
-        }
+        }*/
     }
 
 
     public static boolean canFluidConnectToBlock(IBlockAccess world, int x, int y, int z, int side, Material material) {
-        return world.getBlockMaterial(x, y, z) == material || (side != 1 && (blockIsOpaque(world, x, y, z) || (AquaTweaks.tweakGlass && world.getBlockMaterial(x, y, z) == Material.glass))) || (canConnectAquaConnectable(world, x, y, z, side) && isBlockubmerged(world, x, y, z, material, true) && getFakeFillMaterial(world, x, y, z) == material);
+        return world.getBlockMaterial(x, y, z) == material || (side != 1 && (blockIsOpaque(world, x, y, z) || (AquaTweaks.tweakGlass && world.getBlockMaterial(x, y, z) == Material.glass))) || (canConnectAquaConnectable(world, x, y, z, side) && isBlockubmerged2(world, x, y, z, material, false) && getFakeFillMaterial(world, x, y, z) == material);
     }
 
     public static boolean canFakeFluidConnectToBlock(IBlockAccess world, int x, int y, int z, int side, Material material) {
-        return world.getBlockMaterial(x, y, z) == material || (side != 1 && (blockIsOpaque(world, x, y, z) || (AquaTweaks.tweakGlass && world.getBlockMaterial(x, y, z) == Material.glass))) || (canConnectAquaConnectable(world, x, y, z, side) && isBlockubmerged(world, x, y, z, material, true) && getFakeFillMaterial(world, x, y, z) == material);
+        return world.getBlockMaterial(x, y, z) == material || (side != 1 && (blockIsOpaque(world, x, y, z) || (AquaTweaks.tweakGlass && world.getBlockMaterial(x, y, z) == Material.glass))) || (canConnectAquaConnectable(world, x, y, z, side) && isBlockubmerged2(world, x, y, z, material, false) && getFakeFillMaterial(world, x, y, z) == material);
     }
 
     public static boolean blockIsOpaque(IBlockAccess world, int x, int y, int z) {
@@ -367,6 +367,23 @@ public class FluidUtils {
             ForgeDirection fd = ForgeDirection.getOrientation(f);
             if (Block.blocksList[world.getBlockId(x + fd.offsetX, y + fd.offsetY, z + fd.offsetZ)] instanceof BlockFluid && getEffectiveFlowDelay(world, x + fd.offsetX, y + fd.offsetY, z + fd.offsetZ, material) < 8)
                 return true;
+            if (fakeFluid && canConnectAquaConnectable(world, x + fd.offsetX, y + fd.offsetY, z + fd.offsetZ, ForgeDirection.OPPOSITES[f])
+            )
+                //						&& getFluidHeight(world,x+fd.offsetX,y+fd.offsetY,z+fd.offsetZ,material)<.0625)
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isBlockubmerged2(IBlockAccess world, int x, int y, int z, Material material, boolean fakeFluid) {
+        int i = 0;
+        for (int f = 2; f < 6; ++f) {
+            ForgeDirection fd = ForgeDirection.getOrientation(f);
+            if (Block.blocksList[world.getBlockId(x + fd.offsetX, y + fd.offsetY, z + fd.offsetZ)] instanceof BlockFluid && getEffectiveFlowDelay(world, x + fd.offsetX, y + fd.offsetY, z + fd.offsetZ, material) < 8) {
+                i++;
+                if(i > 1)
+                    return true;
+            }
             if (fakeFluid && canConnectAquaConnectable(world, x + fd.offsetX, y + fd.offsetY, z + fd.offsetZ, ForgeDirection.OPPOSITES[f])
             )
                 //						&& getFluidHeight(world,x+fd.offsetX,y+fd.offsetY,z+fd.offsetZ,material)<.0625)

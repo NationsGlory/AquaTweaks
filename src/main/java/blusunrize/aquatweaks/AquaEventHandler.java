@@ -42,7 +42,10 @@ public class AquaEventHandler
 						int x = event.renderer.posX+xx;
 						int y = event.renderer.posY+yy;
 						int z = event.renderer.posZ+zz;
-						if(FluidUtils.shouldRenderAquaConnectable(event.chunkCache, x,y,z))
+
+						Material material = event.chunkCache.getBlockMaterial(x,y,z);
+
+						if(FluidUtils.shouldRenderAquaConnectable(event.chunkCache, x,y,z) && FluidUtils.isBlockubmerged2(event.chunkCache, x,y,z, material, false))
 							FluidUtils.tessellateFluidBlock(event.renderBlocks.blockAccess, x, y, z, event.renderBlocks, Tessellator.instance);
 						if(AquaTweaks.tweakGlass && event.chunkCache.getBlockMaterial(x,y,z)==Material.glass)
 							FluidUtils.renderTowardsGlass(event.chunkCache, x,y,z, event.renderBlocks);
